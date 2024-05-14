@@ -12,19 +12,21 @@ namespace OpenAI.Threads
     {
         [Preserve]
         public CreateRunRequest(string assistantId, CreateRunRequest request)
-            : this(assistantId, request?.Model, request?.Instructions, request?.Tools, request?.Metadata, request?.Temperature)
+            : this(assistantId, request?.Model, request?.Instructions, request?.additionalInstructions, request?.Tools, request?.Metadata)
         {
         }
 
         [Preserve]
-        public CreateRunRequest(string assistantId, string model = null, string instructions = null, IEnumerable<Tool> tools = null, IReadOnlyDictionary<string, string> metadata = null, float? temperature = null)
+        public CreateRunRequest(string assistantId, string model = null, string instructions = null, string additional_instructions = null, IEnumerable<Tool> tools = null, IReadOnlyDictionary<string, string> metadata = null, float? temperature = null, bool streaming = false)
         {
             AssistantId = assistantId;
             Model = model;
             Instructions = instructions;
+            additionalInstructions = additional_instructions;
             Tools = tools?.ToList();
             Metadata = metadata;
             Temperature = temperature;
+            Stream = streaming;
         }
 
         /// <summary>
@@ -47,6 +49,21 @@ namespace OpenAI.Threads
         [Preserve]
         [JsonProperty("instructions")]
         public string Instructions { get; }
+
+        /// <summary>
+        /// Appends additional instructions at the end of the instructions for the run. 
+        /// This is useful for modifying the behavior on a per-run basis without overriding other instructions.
+        /// </summary>
+        [Preserve]
+        [JsonProperty("additional_instructions")]
+        public string additionalInstructions { get; }
+
+        /// <summary>
+        /// Adds additional messages to the thread before creating the run.
+        /// </summary>
+        //[Preserve]
+        //[JsonProperty("additional_messages")]
+        //public string[] additionalMessages { get; }
 
         /// <summary>
         /// The list of tools that the assistant used for this run.
@@ -72,5 +89,9 @@ namespace OpenAI.Threads
         [Preserve]
         [JsonProperty("temperature")]
         public float? Temperature { get; }
+
+        [Preserve]
+        [JsonProperty("stream")]
+        public bool Stream { get; internal set; }
     }
 }
